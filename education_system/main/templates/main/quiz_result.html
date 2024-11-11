@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- Font Awesome CDN -->
+    <style>
+        /* Basic layout and styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main container styling */
+        .container {
+            padding: 2rem;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        /* Title and content styling */
+        h1 {
+            color: #444;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .summary {
+            font-size: 1.2rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .question {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a> <!-- Added Icon -->
+            <a href="{% url 'course_list' %}"><i class="fas fa-book"></i> Courses</a> <!-- Added Icon -->
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a> <!-- Added Icon -->
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a> <!-- Added Icon -->
+            {% endif %}
+        </div>
+        <div>{{ user.username }}</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Quiz Result</h1>
+
+        <!-- Summary of quiz attempt -->
+        <div class="summary">
+            <p><strong><i class="fas fa-trophy"></i> Score:</strong> {{ quiz_attempt.score }} / {{ quiz_attempt.total_score }}</p>
+            <p><strong><i class="fas fa-clock"></i> Attempted On:</strong> {{ quiz_attempt.attempted_at|date:"F j, Y, g:i a" }}</p>
+        </div>
+
+        <!-- Display each question and the user's answer -->
+        {% for answer in quiz_attempt.answers.all %}
+            <div class="question">
+                <p><strong>Question:</strong> {{ answer.question.text }}</p>
+                <p><strong>Your Answer:</strong> {{ answer.user_answer }}</p>
+
+                {% if answer.question.question_type in "MCQ,TF" %}
+                    <p><strong>Correct Answer:</strong> {{ answer.question.get_correct_answer.text }}</p>
+                {% else %}
+                    <p><strong>Correct Answer:</strong> No correct answer available (Open-ended question)</p>
+                {% endif %}
+
+                {% if answer.is_correct %}
+                    <p class="correct"><i class="fas fa-check-circle"></i> Correct!</p> <!-- Added Icon -->
+                {% else %}
+                    <p class="incorrect"><i class="fas fa-times-circle"></i> Incorrect</p> <!-- Added Icon -->
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Final Score and Return Link -->
+        <div class="summary">
+            <p><strong><i class="fas fa-star"></i> Your Final Score:</strong> {{ quiz_attempt.score }}</p>
+            <a href="{% url 'dashboard' %}"><i class="fas fa-arrow-left"></i> Return to Dashboard</a> <!-- Added Icon -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Errymaple High School | <a href="https://wa.me/263780601210">Privacy Policy</a> | <a href="https://wa.me/263780601210">Terms of Service</a></p>
+    </div>
+
+</body>
+</html>

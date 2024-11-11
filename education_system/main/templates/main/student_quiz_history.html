@@ -1,0 +1,18 @@
+<h2>Quiz Performance Over Time</h2>
+<canvas id="quizHistoryChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('quizHistoryChart').getContext('2d');
+    var quizHistoryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: 'Scores',
+                data: {{ scores|safe }},
+                borderColor: 'green',
+                fill: false
+            }]
+        }
+    });
+</script>

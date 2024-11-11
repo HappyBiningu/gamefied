@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Include FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic reset and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Navbar styling */
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+        }
+        .navbar a:hover {
+            background-color: #555;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Dashboard content */
+        .container {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 2rem auto 0 auto; /* Adjusted margin-top for the same space from top */
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+
+        h1, h2, h3 {
+            color: #444;
+            margin-top: 0;
+        }
+
+        /* List styling */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: #f0f0f0;
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        li:hover {
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+
+        /* Link buttons */
+        .link-button {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link-button:hover {
+            text-decoration: underline;
+        }
+
+        /* Special message for empty lists */
+        .empty-message {
+            color: #999;
+            font-style: italic;
+        }
+
+
+        .admin-dashboard {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            display: inline-block;
+            width: 250px;
+            padding: 20px;
+            background-color: #fff;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .stat-card p {
+            font-size: 1.2rem;
+            color: #333;
+            margin: 0;
+        }
+        
+        .stat-card strong {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Icon styling */
+        .icon {
+            margin-right: 8px;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar a {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+     <!-- Navbar -->
+     <div class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt icon"></i>Dashboard</a>
+            <a href="{% url 'course_list' %}"><i class="fas fa-book icon"></i>Courses</a>
+            
+            <!-- Teacher Dashboard Links -->
+            {% if user.role == 'teacher' %}
+                <a href="{% url 'teacher_dashboard' %}" class="link-button"><i class="fas fa-chalkboard-teacher icon"></i>Teacher Dashboard</a>
+            {% endif %}
+
+            <!-- Admin Dashboard Links -->
+            {% if user.role == 'admin' %}
+                <a href="{% url 'admin_dashboard' %}" class="link-button"><i class="fas fa-cogs icon"></i>Admin Dashboard</a>
+                <a href="{% url 'user_activity' %}" class="link-button"><i class="fas fa-users icon"></i>User Activity</a>
+                <a href="{% url 'user_management' %}" class="link-button"><i class="fas fa-user-cog icon"></i>User Management</a>
+                <a href="{% url 'course_management' %}" class="link-button"><i class="fas fa-book-open icon"></i>Course Management</a>
+                <a href="{% url 'reports' %}" class="link-button"><i class="fas fa-chart-line icon"></i>Reports</a>
+            {% endif %}
+
+            <!-- Leaderboard Link -->
+            {% if leaderboard %}
+                <a href="{% url 'leaderboard' leaderboard.pk %}" class="link-button"><i class="fas fa-trophy icon"></i>View Leaderboard</a>
+            {% endif %}
+            
+            <!-- Quiz Detail -->
+            {% if recent_attempts %}
+                <a href="{% url 'quiz_detail' recent_attempts.0.quiz.pk %}" class="link-button"><i class="fas fa-puzzle-piece icon"></i>{{ recent_attempts.0.quiz.lesson.title }}</a> - Score: {{ recent_attempts.0.score }}
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="navbar-btn" >
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+        </div>
+        <div>{{ user.username }}</div>
+    </div>
+    
+<!-- Main Container -->
+<div class="container">
+    {% if user.role == 'student' %}
+        <h2>Welcome, {{ user.username }} (Student)</h2>
+
+        <h3><i class="fas fa-list-alt icon"></i>Enrolled Courses</h3>
+        <ul>
+            {% for course in enrolled_courses %}
+                <li>
+                    <a href="{% url 'course_detail' course.pk %}" class="link-button">{{ course.title }}</a>
+                </li>
+            {% empty %}
+                <li class="empty-message">No enrolled courses</li>
+            {% endfor %}
+        </ul>
+
+        <h3><i class="fas fa-clipboard-check icon"></i>Recent Quiz Attempts</h3>
+        <ul>
+            {% for attempt in recent_attempts %}
+                <li>
+                    <a href="{% url 'quiz_detail' attempt.quiz.pk %}" class="link-button">{{ attempt.quiz.lesson.title }}</a> - Score: {{ attempt.score }}
+                </li>
+            {% empty %}
+                <li class="empty-message">No recent quiz attempts</li>
+            {% endfor %}
+        </ul>
+
+        <h3><i class="fas fa-medal icon"></i>Earned Badges</h3>
+        <ul>
+            {% for badge in earned_badges %}
+                <li>{{ badge.badge.name }}</li>
+            {% empty %}
+                <li class="empty-message">No badges earned</li>
+            {% endfor %}
+        </ul>
+
+        <h3><i class="fas fa-check-circle icon"></i>Completed Quests</h3>
+        <ul>
+            {% for quest in completed_quests %}
+                <li>{{ quest.quest.title }} - Completed on: {{ quest.completed_at }}</li>
+            {% empty %}
+                <li class="empty-message">No completed quests</li>
+            {% endfor %}
+        </ul>
+
+    {% elif user.role == 'teacher' %}
+        <h2>Welcome, {{ user.username }} (Teacher)</h2>
+
+        <h3><i class="fas fa-chalkboard-teacher icon"></i>Courses Taught</h3>
+        <ul>
+            {% for course in courses_taught %}
+                <li>
+                    <a href="{% url 'course_detail' course.pk %}" class="link-button">{{ course.title }}</a>
+                </li>
+            {% empty %}
+                <li class="empty-message">No courses taught</li>
+            {% endfor %}
+        </ul>
+
+        <h3><i class="fas fa-user-graduate icon"></i>Recent Quiz Attempts by Students</h3>
+        <ul>
+            {% for attempt in recent_attempts %}
+                <li>
+                    <a href="{% url 'quiz_detail' attempt.quiz.pk %}" class="link-button">{{ attempt.quiz.lesson.title }}</a> - {{ attempt.user.username }} - Score: {{ attempt.score }}
+                </li>
+            {% empty %}
+                <li class="empty-message">No recent attempts</li>
+            {% endfor %}
+        </ul>
+
+        {% elif user.role == 'admin' %}
+        <div class="admin-dashboard">
+            <h2>Welcome, {{ user.username }} (Administrator)</h2>
+    
+            <div class="stat-card">
+                <i class="fas fa-users icon"></i>
+                <p>Total Users: <strong>{{ total_users|default:"0" }}</strong></p>
+            </div>
+    
+            <div class="stat-card">
+                <i class="fas fa-book icon"></i>
+                <p>Total Courses: <strong>{{ total_courses|default:"0" }}</strong></p>
+            </div>
+    
+            <div class="stat-card">
+                <i class="fas fa-check-circle icon"></i>
+                <p>Total Quiz Attempts: <strong>{{ total_quiz_attempts|default:"0" }}</strong></p>
+            </div>
+        </div>
+    {% endif %}
+    
+</div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Errymaple High School | <a href="https://wa.me/263780601210">Privacy Policy</a> | <a href="https://wa.me/263780601210">Terms of Service</a></p>
+    </div>
+
+</body>
+</html>

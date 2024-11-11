@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attempt Quiz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- Font Awesome CDN -->
+    <style>
+        /* Basic reset and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main container styling */
+        .container {
+            padding: 2rem;
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* Title and form styling */
+        h1 {
+            color: #444;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Timer styling */
+        .timer {
+            font-size: 1.2rem;
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Question styling */
+        .question {
+            margin-bottom: 1.5rem;
+        }
+        .question h3 {
+            color: #444;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Form fields styling */
+        form input[type="text"], form select, form textarea {
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Submit button styling */
+        .submit-btn {
+            margin-top: 2rem;
+            padding: 0.8rem;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Footer styling */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                max-width: 100%;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .navbar a {
+                padding: 0.5rem 0;
+            }
+        }
+    </style>
+
+    <script>
+        // Countdown Timer Script
+        function startCountdown(duration) {
+            let timer = duration, minutes, seconds;
+            const timerDisplay = document.getElementById('timer');
+
+            const countdownInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('quiz-form').submit();  // Auto-submit form
+                }
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const timeLimit = {{ quiz.time_limit|default:120 }} * 60;  // Convert minutes to seconds
+            startCountdown(timeLimit);
+        });
+    </script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a> <!-- Added Icon -->
+            <a href="{% url 'course_list' %}"><i class="fas fa-book"></i> Courses</a> <!-- Added Icon -->
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a> <!-- Added Icon -->
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a> <!-- Added Icon -->
+            {% endif %}
+        </div>
+        <div>{{ user.username }}</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Attempt Quiz</h1>
+
+        <!-- Display Countdown Timer -->
+        <div id="timer" class="timer">Time Remaining: Loading...</div>
+
+        <form method="post" id="quiz-form">
+            {% csrf_token %}
+            
+            <!-- Display Each Question with Its Time Limit -->
+            {% for question in questions %}
+                <div class="question">
+                    <h3>{{ question.text }}</h3>
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit Quiz</button> <!-- Added Icon -->
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Errymaple High School | <a href="https://wa.me/263780601210">Privacy Policy</a> | <a href="https://wa.me/263780601210">Terms of Service</a></p>
+    </div>
+
+</body>
+</html>

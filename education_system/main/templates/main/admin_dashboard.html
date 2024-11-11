@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 30px;
+            font-size: 2rem;
+        }
+
+        .table-container {
+            width: 80%;
+            margin: 30px auto;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #999;
+        }
+
+        .icon {
+            margin-right: 8px;
+        }
+
+        .score {
+            font-weight: bold;
+        }
+
+        .fa-check-circle {
+            color: #4CAF50;
+        }
+
+        .fa-exclamation-circle {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="table-container">
+        <h2><i class="fas fa-chart-line icon"></i> User Overview</h2>
+
+        {% if user_data %}
+            <canvas id="userChart"></canvas>
+        {% else %}
+            <div class="no-data">
+                <i class="fas fa-info-circle"></i> No user data available.
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('userChart').getContext('2d');
+        var userChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: {{ user_data.labels|safe }},
+                datasets: [{
+                    data: {{ user_data.data|safe }},
+                    backgroundColor: ['#FF5733', '#33FF57', '#3357FF'],
+                }]
+            }
+        });
+    </script>
+
+</body>
+</html>

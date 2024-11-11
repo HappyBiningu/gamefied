@@ -1,0 +1,110 @@
+<!-- templates/main/quiz_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ quiz.lesson.title }} Quiz</title>
+    <style>
+        /* Basic reset and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main container styling */
+        .container {
+            padding: 2rem;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Title styling */
+        h1 {
+            color: #444;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        /* Button styling */
+        .start-quiz-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.8rem 2rem;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .start-quiz-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'course_list' %}">Courses</a>
+            <a href="{% url 'leaderboard' quiz.lesson.course.pk %}">Leaderboard</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+        <div>{{ user.username }}</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>{{ quiz.lesson.title }} Quiz</h1>
+        <p>Take this quiz to test your understanding of {{ quiz.lesson.title }}.</p>
+        <a href="{% url 'attempt_quiz' quiz.pk %}" class="start-quiz-btn">Start Quiz</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Errymaple High School | <a href="https://wa.me/263780601210">Privacy Policy</a> | <a href="https://wa.me/263780601210">Terms of Service</a></p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <!-- Include FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic reset and layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main container styling */
+        .container {
+            padding: 2rem;
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Title styling */
+        h1 {
+            color: #444;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        /* List styling */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f0f0f0;
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li:hover {
+            background: #e0e0e0;
+        }
+
+        /* Link styling */
+        .link-button {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .link-button:hover {
+            text-decoration: underline;
+        }
+
+        /* Empty message styling */
+        .empty-message {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Icon styling */
+        .icon {
+            margin-right: 8px;
+        }
+
+        /* Button styling */
+        .create-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .create-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Action buttons (edit, delete) */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .action-buttons a {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            color: #007bff;
+            background-color: #f0f0f0;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .action-buttons a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Button for delete confirmation */
+        .delete-button {
+            color: #e74c3c;
+        }
+        .delete-button:hover {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div>
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt icon"></i>Dashboard</a>
+            <a href="{% url 'course_list' %}"><i class="fas fa-book icon"></i>Courses</a>
+            <a href="{% url 'leaderboard' 1 %}"><i class="fas fa-trophy icon"></i>Leaderboard</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt icon"></i>Login</a>
+            {% endif %}
+        </div>
+        <div>{{ user.username }}</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1><i class="fas fa-graduation-cap icon"></i>Courses</h1>
+
+        {% if user.role == 'teacher' or user.role == 'admin' %}
+            <a href="{% url 'create_course' %}" class="create-button"><i class="fas fa-plus icon"></i>Create New Course</a>
+        {% endif %}
+
+        {% if user.role == "student" %}
+            <p><i class="fas fa-book-reader icon"></i>Enrolled Courses:</p>
+            <ul>
+                {% for course in enrolled_courses %}
+                    <li>
+                        <a href="{% url 'course_detail' course.pk %}" class="link-button"><i class="fas fa-caret-right icon"></i>{{ course.title }}</a>
+                    </li>
+                {% empty %}
+                    <li class="empty-message"><i class="fas fa-exclamation-circle icon"></i>You are not enrolled in any courses yet.</li>
+                {% endfor %}
+            </ul>
+        {% elif user.role == "teacher" %}
+            <p><i class="fas fa-chalkboard-teacher icon"></i>Courses You Teach:</p>
+            <ul>
+                {% for course in courses_taught %}
+                    <li>
+                        <div>
+                            <a href="{% url 'course_detail' course.pk %}" class="link-button"><i class="fas fa-caret-right icon"></i>{{ course.title }}</a>
+                        </div>
+                        <div class="action-buttons">
+                            <a href="{% url 'edit_course' course.pk %}" class="link-button"><i class="fas fa-edit icon"></i>Edit</a>
+                            <a href="{% url 'delete_course' course.pk %}" class="link-button delete-button" onclick="return confirm('Are you sure you want to delete this course?');"><i class="fas fa-trash-alt icon"></i>Delete</a>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="empty-message"><i class="fas fa-exclamation-circle icon"></i>You are not teaching any courses yet.</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><i class="fas fa-university icon"></i>All Courses:</p>
+            <ul>
+                {% for course in courses %}
+                    <li>
+                        <div>
+                            <a href="{% url 'course_detail' course.pk %}" class="link-button"><i class="fas fa-caret-right icon"></i>{{ course.title }}</a>
+                        </div>
+                        {% if user.role == 'teacher' or user.role == 'admin' %}
+                            <div class="action-buttons">
+                                <a href="{% url 'edit_course' course.pk %}" class="link-button"><i class="fas fa-edit icon"></i>Edit</a>
+                                <a href="{% url 'delete_course' course.pk %}" class="link-button delete-button" onclick="return confirm('Are you sure you want to delete this course?');"><i class="fas fa-trash-alt icon"></i>Delete</a>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <li class="empty-message"><i class="fas fa-exclamation-circle icon"></i>No courses available at the moment.</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Errymaple High School | <a href="https://wa.me/263780601210">Privacy Policy</a> | <a href="https://wa.me/263780601210">Terms of Service</a></p>
+    </div>
+
+</body>
+</html>

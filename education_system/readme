@@ -1,0 +1,7 @@
+#unzip folder
+#activate env gamicx/Scripts/activate
+#pip install -r requirements.txt
+#cd education_system
+#py manage.py runserver
+#0780601210
+
